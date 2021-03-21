@@ -64,6 +64,20 @@ const reconcileChildren = (fiber, children) => {
 
 const executeTask = fiber => {
   reconcileChildren(fiber, fiber.props.children)
+  if (fiber.child) {
+    return fiber.child
+  }
+
+  let currentExecutelyFiber = fiber
+
+  while (currentExecutelyFiber.parent) {
+    if (currentExecutelyFiber.sibling) {
+      return fiber.sibling
+    }
+    currentExecutelyFiber = currentExecutelyFiber.parent
+  }
+
+  
   console.log(fiber)
 }
 
