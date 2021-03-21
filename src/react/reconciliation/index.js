@@ -71,14 +71,17 @@ const executeTask = fiber => {
   let currentExecutelyFiber = fiber
 
   while (currentExecutelyFiber.parent) {
+    currentExecutelyFiber.parent.effects = currentExecutelyFiber.parent.effects.concat(
+      currentExecutelyFiber.effects.concat([currentExecutelyFiber])
+    )
     if (currentExecutelyFiber.sibling) {
-      return fiber.sibling
+      return currentExecutelyFiber.sibling
     }
     currentExecutelyFiber = currentExecutelyFiber.parent
   }
 
   
-  console.log(fiber)
+  console.log(currentExecutelyFiber)
 }
 
 const workLoop = deadline => {
