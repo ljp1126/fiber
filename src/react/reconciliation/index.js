@@ -7,7 +7,6 @@ let subTask = null;
 let pendingCommit = null
 
 const commitAllWork = fiber => {
-  console.log(fiber)
   fiber.effects.forEach(item => {
     if (item.effectTag === "placement") {
       item.parent.stateNode.appendChild(item.stateNode)
@@ -31,6 +30,7 @@ const getFirstTask = () => {
 }
 
 const reconcileChildren = (fiber, children) => {
+  console.log(children)
   /**
    * children 可能是对象 也可能是数组
    * 将children 转换成数组
@@ -74,7 +74,11 @@ const reconcileChildren = (fiber, children) => {
 }
 
 const executeTask = fiber => {
-  reconcileChildren(fiber, fiber.props.children)
+  if (fiber.tag === "class_component") {
+    reconcileChildren(fiber, fiber.stateNode,render())
+  } else {
+    reconcileChildren(fiber, fiber.props.children)
+  }
   if (fiber.child) {
     return fiber.child
   }
