@@ -1,12 +1,71 @@
-import { createTaskQueue } from "../Misc"
+import { createTaskQueue, arrified, createStateNode, getTag } from "../Misc"
 
 const taskQueue = createTaskQueue()
 
-const subTask = null;
+let subTask = null;
 
-const getFirstTask = () => {}
+const getFirstTask = () => {
+  /**
+   * 从任务队列中获取任务
+   */
+  const task = taskQueue.pop()
+  // console.log(task)
+  return {
+    props: task.props,
+    stateNode: task.dom,
+    tag: "host_root",
+    effects: [],
+    child: null
+  }
+}
 
-const executeTask = fiber => {}
+const reconcileChildren = (fiber, children) => {
+  /**
+   * children 可能是对象 也可能是数组
+   * 将children 转换成数组
+   */
+
+  const arrifiedChildren = arrified(children)
+  let index = 0
+  let numberOfElements = arrifiedChildren.length
+  let element = null
+  let newFiber = null
+  let prevFiber = null
+
+  while (index < numberOfElements) {
+    element = arrifiedChildren[index]
+    newFiber = {
+      type: element.type,
+      props: element.props,
+      tag: getTag(element), // "host_component"
+      effects: [],
+      effectTag: "placement",
+      stateNode: null,
+      parent: fiber
+    }
+
+    /**
+     * 为fiber节点添加DOM对象或者组件实例对象
+     */
+    newFiber.stateNode = createStateNode(newFiber)
+
+    if (index === 0) {
+      fiber.child = newFiber
+    } else {
+      prevFiber.sibling = newFiber
+    }
+
+    prevFiber = newFiber
+
+    index++
+  }
+
+}
+
+const executeTask = fiber => {
+  reconcileChildren(fiber, fiber.props.children)
+  console.log(fiber)
+}
 
 const workLoop = deadline => {
   /**
@@ -34,7 +93,7 @@ const performTask = deadline => {
    * 再一次告诉浏览器在空闲的时间执行任务
    */
   if (subTask || taskQueue.isEmpty()) {
-    requestIdleCallBack(performTask)
+    requestIdleCallback(performTask)
   }
 }
 
@@ -58,5 +117,5 @@ export const render = (element, dom) => {
   /**
    * 在浏览器空闲时候执行
    */
-  requestIdleCallBack(performTask)
+  requestIdleCallback(performTask)
 }
