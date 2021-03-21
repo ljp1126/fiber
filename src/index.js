@@ -1,2 +1,11 @@
+import React, { render } from "./react"
 
-console.log("from client js")
+const root = document.getElementById("root")
+
+const jsx = (
+  <div>
+    <p>Hello React</p>
+  </div>
+)
+
+render(jsx, root)
